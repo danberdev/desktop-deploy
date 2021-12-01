@@ -1,5 +1,23 @@
 #!/usr/bin/env bash
 
+# List of packages that will be installed from the official repositories
+PKG_LIST="base base-devel linux linux-firmware btrfs-progs man-db man-pages texinfo \
+          networkmanager sway swaylock swayidle slurp bemenu alacritty waybar grim \
+          mako wallutils xorg-xwayland grub efibootmgr light wireguard-tools \
+          intel-ucode mlocate alsa-utils pulseaudio keepassxc gimp krita inkscape \
+          libreoffice thunderbird docker mc htop neofetch sxiv tor \
+          torbrowser-launcher mpd ncmpcpp mpv youtube-dl rtorrent wget electrum \
+          telegram-desktop signal-desktop ardour ffmpeg zathura cmake tmux git \
+          zbar hledger bat ripgrep exa fd cryptsetup jq inetutils ttc-iosevka \
+          otf-font-awesome curl wget clang fuse angband nethack supertuxkart bind
+          whois nmap noto-fonts noto-fonts-cjk noto-fonts-emoji noto-fonts-extra powertop \
+          rtorrent deno qemu rsync gperf acpi xdg-desktop-portal-wlr  unzip unrar p7zip \
+          zathura-pdf-mupdf vkd3d lib32-vkd3d lib32-gst-plugins-base-libs nftables"
+
+# List of packages that will be installed from AUR
+AUR_LIST="emacs-gcc-wayland-devel-bin brave-bin ssss eddie-cli freenet i2p \
+          electrum-dash slack-desktop pacmixer loc ttf-iosevka-term zls airshipper"
+
 retry() {
     until $@
     do
@@ -87,15 +105,6 @@ base_install() {
 
     create_and_mount_filesystems
 
-    PKG_LIST="base base-devel linux linux-firmware btrfs-progs man-db man-pages texinfo \
-          networkmanager sway swaylock swayidle slurp bemenu alacritty waybar grim \
-          mako wallutils xorg-xwayland grub efibootmgr light wireguard-tools \
-          intel-ucode mlocate alsa-utils pulseaudio keepassxc gimp krita inkscape \
-          libreoffice thunderbird docker mc htop neofetch sxiv tor \
-          torbrowser-launcher mpd ncmpcpp mpv youtube-dl rtorrent wget electrum \
-          telegram-desktop signal-desktop ardour ffmpeg zathura cmake tmux git \
-          zbar hledger bat ripgrep exa fd cryptsetup jq inetutils ttc-iosevka \
-          otf-font-awesome curl wget"
     pacstrap /mnt $(echo $PKG_LIST)
 
     genfstab -U /mnt > /mnt/etc/fstab
@@ -168,9 +177,6 @@ chroot() {
 
     su danberdev -c 'cd /tmp && git clone https://aur.archlinux.org/paru.git && cd paru && makepkg -si'
 
-
-    AUR_LIST="emacs-gcc-wayland-devel-bin brave-bin ssss eddie-cli freenet i2p \
-              electrum-dash slack-desktop pacmixer loc ttf-iosevka-term"
     su danberdev -c "paru -Sy --noconfirm $AUR_LIST"
 
     su danberdev -c 'cd /tmp && git clone https://github.com/danberdev/dotfiles && cd dotfiles && ./scripts/deploy.sh'
@@ -178,6 +184,8 @@ chroot() {
     su danberdev -c 'git clone https://github.com/danberdev/emacs-config ~/.emacs.d'
 
     su danberdev -c "curl --proto '=https' --tlsv1.2 https://sh.rustup.rs -sSf | sh"
+
+    su danberdev -c "mkdir -p .local/share/mpd/playlists"
 
     exit
 }
